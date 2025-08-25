@@ -8,8 +8,8 @@ Behavior can be controlled by genes.
 
 ### Links
 
-* Home page - [https://github.com/trevorpao/geneEH](https://github.com/trevorpao/geneEH)
-* Demo page - [https://trevorpao.github.io/geneEH/](https://trevorpao.github.io/geneEH/)
+* Home page - [https://github.com/trevorpao/gene-event-handler](https://github.com/trevorpao/gene-event-handler)
+* Demo page - [https://trevorpao.github.io/gene-event-handler/](https://trevorpao.github.io/gene-event-handler/)
 
 ### Dependencies
 - [jquery](https://jquery.com/)
