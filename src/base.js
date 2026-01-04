@@ -1,5 +1,3 @@
-import validatr from './validatr.js';
-
 "use strict";
 
 // Hook for handling 'react' events
@@ -38,79 +36,6 @@ gee.hook('alert', function (me) {
 gee.hook('resetForm', function (me) {
     let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
     if (form) form.reset();
-});
-
-// Hook for standard form submission
-gee.hook('stdSubmit', function (me) {
-    let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
-    if (!form) return;
-
-    let dAction = function () {
-        // Re-enable the button and remove the spinner icon
-        me.removeAttribute('disabled');
-        let icon = me.querySelector('i');
-        if (icon) icon.remove();
-
-        if (this.code !== 1) {
-            if (gee.isDefined(this.data) && gee.isDefined(this.data.msg)) {
-                gee.alert({
-                    title: 'Alert!',
-                    txt: this.data.msg
-                });
-            } else {
-                gee.alert({
-                    title: 'Error!',
-                    txt: 'Server Error, Please Try Later(' + this.code + ')'
-                });
-            }
-        } else {
-            if (me.getAttribute('reset') === '1') {
-                form.reset();
-            }
-
-            if (gee.isDefined(this.data.msg)) {
-                gee.alert({
-                    title: 'Alert!',
-                    txt: this.data.msg
-                });
-            }
-
-            if (gee.isDefined(this.data.uri)) {
-                location.href = (this.data.uri === '') ? gee.apiUri : this.data.uri;
-            }
-
-            if (gee.isDefined(this.data.goback)) {
-                history.go(-1);
-            }
-
-            if (gee.isDefined(this.data.reset)) {
-                form.reset();
-            }
-
-            if (gee.check(this.data.func)) {
-                gee.logDebug(this.data.func, gee.debug);
-                gee.exe(this.data.func, me);
-            }
-        }
-    };
-
-    // Clear placeholder values from inputs
-    form.querySelectorAll('input').forEach(input => {
-        if (input.value === input.placeholder) {
-            input.value = '';
-        }
-    });
-
-    if (!validatr.validateForm(form)) {
-        return false;
-    } else {
-        me.setAttribute('disabled', 'disabled');
-        let spinner = document.createElement('i');
-        spinner.className = 'fa fa-spinner fa-pulse fa-fw';
-        me.appendChild(spinner);
-
-        gee.yell(me.dataset.uri, new FormData(form), dAction, dAction);
-    }
 });
 
 /**
