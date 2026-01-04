@@ -4,13 +4,13 @@
   "description": "a event handler",
   "author": "Trevor Pao",
   "scripts": {
-    "watch": "parcel watch",
+    "watch": "parcel serve app/index.html --open",
+    "readme": "http-server document -p 3000 -c-1 -o index.html",
     "build": "parcel build",
     "lint": "npx eslint ./src/*.js",
     "fix": "npx eslint ./src/*.js --fix"
   },
   "source": "src/index.js",
-  "main": "dist/main.js",
   "license": "MIT",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "repository": {
