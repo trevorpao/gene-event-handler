@@ -209,6 +209,14 @@ let gene = {
                 promoterMapping[evt] = me.dataset.behavior || 'notfound';
             }
 
+            // Expand semantic hover to mouseenter + mouseleave
+            if (promoterMapping.hover) {
+                const beh = promoterMapping.hover;
+                promoterMapping.mouseenter = beh;
+                promoterMapping.mouseleave = beh;
+                delete promoterMapping.hover;
+            }
+
             utils.logDebug(promoterMapping, gene.debug);
             me.dna = promoterMapping;
             me.replaceWith(me.cloneNode(true));
