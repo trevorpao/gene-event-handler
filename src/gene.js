@@ -30,10 +30,14 @@ let gene = {
     },
 
     load: function(functionName) {
-        let uri = new URL(gene.subFolder + '/' + functionName + '.js', import.meta.url);
+        if (!functionName) return null;
+        const uri = new URL(gene.subFolder + '/' + functionName + '.js', import.meta.url);
+        gene.clog(uri.pathname);
 
-        gene.clog(uri);
-        import(uri.pathname);
+        return import(uri.pathname).catch(err => {
+            gene.err('load fail::' + functionName + ' :: ' + (err && err.message ? err.message : err));
+            return null;
+        });
     },
 
     notfound: function(me) {
