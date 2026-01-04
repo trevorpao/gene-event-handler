@@ -155,22 +155,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.js"></script>
-    <!-- build:js scripts/jquery.gene.min.js -->
-    <!-- bower:js -->
-    <!-- endbower -->
-    <script src="scripts/validatr.js"></script>
-    <script src="scripts/jquery.gene.js"></script>
-    <!-- endbuild -->
-    <script>
-    var gee = gee || $.fn.gene;
-    gee.apiUri = 'http://demo.aiocms.sense-info.co' + '/api';
-    gee.debug = 0;
-
-    $(document).ready(function() {
-        gee.init();
-    });
-
-    </script>
+    <!-- Parcel will bundle module entry; no separate legacy scripts required -->
+    <script type="module" src="../src/index.js"></script>
 </body>
 
 </html>

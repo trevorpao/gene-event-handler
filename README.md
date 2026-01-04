@@ -12,59 +12,64 @@ Behavior can be controlled by genes.
 * Demo page - [https://trevorpao.github.io/geneEH/](https://trevorpao.github.io/geneEH/)
 
 ### Dependencies
-- [jquery](https://jquery.com/)
+- [cash-dom](https://github.com/fabiospampinato/cash) (lightweight jQuery-compatible API)
+- [validatr](https://github.com/macek/jquery-validate) or equivalent form validator used by the project
 
 ### Installation
 
 - Bower
 
 ```bash
-    bower install gene-event-handler
+bower install gene-event-handler
 ```
 
-### Basic usage
+### Basic usage (ES modules)
 
 In order to hide all elements when they are supposed to be hidden. (Anti Flickering)
 
 - CSS
 
 ```
-    .gee {
-        display: none;
-    }
+.gee {
+  display: none;
+}
 ```
 
-- HTML
+- HTML + JavaScript (bundled/module workflow)
 
 ```html
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" crossorigin="anonymous"></script>
-    <script src="scripts/jquery.gene.min.js"></script>
+<!-- Load a jQuery-compatible helper -->
+<script src="https://unpkg.com/cash-dom/dist/cash.min.js"></script>
 
+<script type="module">
+  import gee from './scripts/gene.js';
 
-    <!-- submit a form -->
-    <form class="form-inline">
-      <div class="form-group">
-        <label for="exampleInputName2">Name</label>
-        <input type="text" class="form-control" id="exampleInputName2" placeholder="Jane Doe">
-      </div>
-      <div class="form-group">
-        <label for="exampleInputEmail2">Email</label>
-        <input type="email" class="form-control" id="exampleInputEmail2" placeholder="jane.doe@example.com">
-      </div>
+  // Optional configuration
+  gee.apiUri = 'https://your.api/endpoint';
+  gee.debug = 1;
 
-      <button type="button" class="btn btn-default gee" data-uri="/invitation/add_new" data-gene="stdSubmit">Send invitation</button>
-    </form>
-
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    gee.init();
+  });
+    
+  // Example: submit a form
+  // <button type="button" class="gee" data-uri="/invitation/add_new" data-gene="stdSubmit">Send invitation</button>
+</script>
 ```
 
-- JavaScript
+### Basic usage (legacy build)
 
-```javascript
-    var gee = gee || $.fn.gene;
+If you are using the prebuilt script output from this repository’s `app/scripts` bundle, include it directly:
 
-    $(document).ready(function() {
-        gee.init();
-    });
+```html
+<script src="https://unpkg.com/cash-dom/dist/cash.min.js"></script>
+<script src="scripts/jquery.gene.min.js"></script>
+
+<script>
+  var gee = window.gee;
+  gee.init();
+</script>
 ```
 
 ## Contribute
@@ -72,7 +77,7 @@ In order to hide all elements when they are supposed to be hidden. (Anti Flicker
 You're more than welcome to contribute to this project. 
 
 * Run `gulp serve` to preview and watch for changes
-* Run `bower install` --save <package> to install frontend dependencies
+* Run `bower install --save <package>` to install frontend dependencies
 * Run `gulp serve:test` to run the tests in the browser
 * Run `gulp` to build your webapp for production
 * Run `gulp serve:dist` to preview the production build

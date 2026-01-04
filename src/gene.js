@@ -1,3 +1,4 @@
+// Importing utility functions
 import utils from './utils.js';
 
 'use strict';
@@ -12,37 +13,41 @@ let gene = {
     taClass: 'gee',
     apiUri: '/',
 
+    // Standard form submission handler
     stdSubmit: function(me) {
-        let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : $(me).closest('form');
+        let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
+        if (!form) return;
+
         let dAction = function() {
             me.removeAttribute('disabled');
-            me.querySelector('i').remove();
+            let icon = me.querySelector('i');
+            if (icon) icon.remove();
 
             if (this.code == '1') {
-                if (me.attr('reset') === '1') {
+                if (me.getAttribute('reset') === '1') {
                     form.reset();
                 }
-                if (gene.isset(this.data.msg)) {
+                if (utils.isDefined(this.data.msg)) {
                     gene.alert({
                         title: 'Alert!',
                         txt: this.data.msg
                     });
                 }
-                if (gene.isset(this.data.uri)) {
+                if (utils.isDefined(this.data.uri)) {
                     location.href = (this.data.uri === '') ? gene.apiUri : this.data.uri;
                 }
-                if (gene.isset(this.data.goback)) {
+                if (utils.isDefined(this.data.goback)) {
                     history.go(-1);
                 }
-                if (gene.isset(this.data.reset)) {
+                if (utils.isDefined(this.data.reset)) {
                     form.reset();
                 }
                 if (gene.check(this.data.func)) {
-                    gene.clog(this.data.func);
+                    utils.logDebug(this.data.func, gene.debug);
                     gene.exe(this.data.func, me);
                 }
             } else {
-                if (gene.isset(this.data) && gene.isset(this.data.msg)) {
+                if (utils.isDefined(this.data) && utils.isDefined(this.data.msg)) {
                     gene.alert({
                         title: 'Alert!',
                         txt: this.data.msg
@@ -50,71 +55,72 @@ let gene = {
                 } else {
                     gene.alert({
                         title: 'Error!',
-                        txt: 'Server Error, Plaese Try Later(' + this.code + ')'
+                        txt: 'Server Error, Please Try Later(' + this.code + ')'
                     });
                 }
             }
         };
 
-        let inputs = $(me).find('input');
-        for (let i = 0; i < inputs.length; i++) {
-            if (inputs[i].value == inputs[i].placeholder) {
-                inputs[i].value = '';
+        let inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.value == input.placeholder) {
+                input.value = '';
             }
-        }
+        });
 
         if (!$.validatr.validateForm(form)) {
             return false;
         } else {
-            me.disabled = 'disabled';
-            $(me).append('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
-            gene.yell(me.dataset.uri, $(me).serialize(form), dAction, dAction);
+            me.disabled = true;
+            let spinner = document.createElement('i');
+            spinner.className = 'fa fa-spinner fa-pulse fa-fw';
+            me.appendChild(spinner);
+            gene.yell(me.dataset.uri, new FormData(form), dAction, dAction);
         }
     },
 
-    yell: function(uri, postData, successCB, errorCB, type, hideLoadAnim) {
-        let json = (uri.indexOf('://') == -1) ? 'json' : 'jsonp';
-        type = type || 'POST';
-        uri = (uri.indexOf('://') == -1) ? gene.apiUri + uri : uri;
+    yell: function(uri, postData, successCB, errorCB, type = 'POST', hideLoadAnim = false) {
+        let json = uri.includes('://') ? 'jsonp' : 'json';
+        uri = uri.includes('://') ? uri : gene.apiUri + uri;
 
         if (!hideLoadAnim) {
             gene.loadAnim('show');
         }
 
         fetch(uri, {
-            method: type, // or 'POST'
-            body: postData, // data can be `string` or {object}!
+            method: type,
+            body: postData,
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then(j => {
             if (j) {
-                gene.clog(j);
-                if (gene.isset(j.errorCode)) {
-                    if (typeof errorCB == 'function') {
+                utils.logDebug(j, gene.debug);
+                if (utils.isDefined(j.errorCode)) {
+                    if (typeof errorCB === 'function') {
                         errorCB.call(j);
                     } else {
                         gene.alert({
                             title: 'Error!',
-                            txt: 'Server Error, Plaese Try Later(' + j.errorCode + ')'
+                            txt: 'Server Error, Please Try Later(' + j.errorCode + ')'
                         });
                     }
                 } else {
-                    if (typeof successCB == 'function') {
+                    if (typeof successCB === 'function') {
                         successCB.call(j);
                     }
                 }
             } else {
                 gene.alert({
                     title: 'Error!',
-                    txt: 'Server Error, Plaese Try Later(2)'
+                    txt: 'Server Error, Please Try Later(2)'
                 });
             }
 
         }).catch(error => {
-            gene.err('ajax fail(' + o.status + ')!!');
+            gene.err('ajax fail(' + error.message + ')!!');
         }).finally(() => {
-            gene.clog('ajax complete');
+            utils.logDebug('ajax complete', gene.debug);
             if (!hideLoadAnim) {
                 gene.loadAnim('hide');
             }
@@ -215,69 +221,45 @@ let gene = {
         gene.exe(me.dna[evt.type], $(me));
     },
 
-    init: function(element) {
-        for (let tk in gene.tags) {
-            gene.exe(gene.tags[tk], $(gene.tags[tk]));
-        }
+    init: function(element = 'body') {
+        gene.tags.forEach(tag => {
+            gene.exe(tag, document.querySelectorAll(tag));
+        });
 
-        if (element === void 0) {
-            element = 'body';
-        }
+        document.querySelectorAll(`${element} .${gene.taClass}`).forEach(me => {
+            let evt = me.dataset.event || gene.evts[me.dataset.behavior] || 'click';
+            let promoterMapping = {};
 
-        $(element).find('.' + gene.taClass).each(function() {
-            let me = this,
-                evt = me.dataset.event,
-                behavior = me.dataset.behavior,
-                clustered = me.dataset.gene,
-                promoterMapping = {};
-
-            if (!gene.isset(behavior)) {
-                behavior = 'notfound';
-            }
-
-            if (!gene.isset(evt)) {
-                evt = (!gene.isset(gene.evts[behavior])) ? 'click' : gene.evts[behavior];
-            }
-
-            if (!gene.isset(clustered)) {
-                promoterMapping[evt] = behavior;
+            if (me.dataset.gene) {
+                me.dataset.gene.split(',').forEach(pair => {
+                    let [event, behavior] = pair.split(':');
+                    promoterMapping[event || 'click'] = behavior || event;
+                });
             } else {
-                let lvl2 = clustered.replace(' ', '').split(',');
-
-                for (let i2 = 0; i2 < lvl2.length; i2++) {
-                    let lvl3 = lvl2[i2].split(':');
-                    if (!gene.isset(lvl3[1])) {
-                        lvl3[1] = lvl3[0];
-                        lvl3[0] = 'click';
-                    }
-                    promoterMapping[lvl3[0]] = lvl3[1];
-                }
+                promoterMapping[evt] = me.dataset.behavior || 'notfound';
             }
 
-            gene.clog(promoterMapping);
+            utils.logDebug(promoterMapping, gene.debug);
             me.dna = promoterMapping;
-            $(me).off();
+            me.replaceWith(me.cloneNode(true));
 
-            for (let evt in promoterMapping) {
-                let lvl4 = promoterMapping[evt].split('|');
-                for (let i4 = 0; i4 < lvl4.length; i4++) {
-                    if (!gene.check(lvl4[i4])) {
-                        gene.load(lvl4[i4]);
-                    }
-
-                    if (!gene.check(lvl4[i4])) {
-                        gene.clog('load fail:::' + lvl4[i4]);
-                    }
+            Object.entries(promoterMapping).forEach(([event, behavior]) => {
+                if (!gene.check(behavior)) {
+                    gene.load(behavior);
                 }
 
-                if (evt == 'init') {
-                    gene.exe(promoterMapping[evt], me);
-                } else if (evt == 'scroll') {
+                if (!gene.check(behavior)) {
+                    utils.logDebug('load fail:::' + behavior, gene.debug);
+                }
+
+                if (event === 'init') {
+                    gene.exe(behavior, me);
+                } else if (event === 'scroll') {
                     let target = me.dataset.target;
                     let margin = me.dataset.margin || '0px';
-                    me.watchdog = new IntersectionObserver(function(entries) {
+                    me.watchdog = new IntersectionObserver(entries => {
                         if (entries[0].isIntersecting) {
-                            gene.exe(me.dataset.dna['scroll'], $(me));
+                            gene.exe(me.dataset.dna['scroll'], me);
                         }
                     }, {
                         root: me,
@@ -285,15 +267,13 @@ let gene = {
                     });
 
                     me.watchdog.observe(me.querySelector(target));
-                    me.watchdog.reset = function () {
-                        me.watchdog.unobserve(entries[0].target);
-                        me.watchdog.observe(me.querySelector(target));
-                    };
                 } else {
-                    $(me).on(evt, gene.promoter);
+                    me.addEventListener(event, gene.promoter);
                 }
-            }
-        }).removeClass(gene.taClass);
+            });
+        });
+
+        document.querySelectorAll(`.${gene.taClass}`).forEach(el => el.classList.remove(gene.taClass));
     }
 };
 

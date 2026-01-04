@@ -18,10 +18,11 @@
     "url": "git@github.com:trevorpao/geneEH.git"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=20"
   },
   "devDependencies": {
-    "parcel": "latest"
+    "http-server": "^14.1.1",
+    "parcel": "^2.16.3"
   },
   "eslintConfig": {
     "env": {

@@ -1,127 +1,144 @@
-
 "use strict";
 
+// Hook for handling 'react' events
 gee.hook('react', function (me) {
-    let ta = $(me.event.target);
+    let target = me.event.target;
 
-    if (!ta.attr('func')) {
-        ta = ta.parent();
+    // Traverse up to find the element with 'func' attribute
+    while (target && !target.getAttribute('func')) {
+        target = target.parentElement;
     }
 
-    let func = ta.attr('func');
-    let type = ta.data('event') || 'click';
+    if (!target) return;
 
-    gee.clog(func);
+    let func = target.getAttribute('func');
+    let type = target.dataset.event || 'click';
 
+    gee.logDebug(func, gee.debug);
+
+    // Execute the function if the event type matches and the function is valid
     if (type === me.event.type && gee.check(func)) {
-        ta.event = me.event;
-        gee.exe(func, ta);
+        target.event = me.event;
+        gee.exe(func, target);
     }
 });
 
+// Hook for displaying alerts
 gee.hook('alert', function (me) {
-    let title = me.title || me.data('title');
-    let content = me.txt || me.data('txt');
+    let title = me.title || me.dataset.title;
+    let content = me.txt || me.dataset.txt;
 
-    // $('#errorModal')
-    // .find('.title').html(title).end()
-    // .find('.content').html(content).end()
-    // .modal('show');
+    // Display the alert content
     alert(content);
 });
 
+// Hook for resetting forms
 gee.hook('resetForm', function (me) {
-    let form = me.data('ta') ? $('#' + me.data('ta')) : me.closest('form');
-    form[0].reset();
+    let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
+    if (form) form.reset();
 });
 
+// Hook for standard form submission
 gee.hook('stdSubmit', function (me) {
-    let g = $.fn.gene,
-        form = me.data('ta') ? $('#' + me.data('ta')) : me.closest('form'),
-        dAction = function () {
+    let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
+    if (!form) return;
 
-            me.removeAttr('disabled').find('i').remove();
+    let dAction = function () {
+        // Re-enable the button and remove the spinner icon
+        me.removeAttribute('disabled');
+        let icon = me.querySelector('i');
+        if (icon) icon.remove();
 
-            if (this.code !== 1) {
-                if (gee.isset(this.data) && gee.isset(this.data.msg)) {
-                    gee.alert({
-                        title: 'Alert!',
-                        txt: this.data.msg
-                    });
-                } else {
-                    g.alert({
-                        title: 'Error!',
-                        txt: 'Server Error, Plaese Try Later(' + this.code + ')'
-                    });
-                }
+        if (this.code !== 1) {
+            if (gee.isDefined(this.data) && gee.isDefined(this.data.msg)) {
+                gee.alert({
+                    title: 'Alert!',
+                    txt: this.data.msg
+                });
             } else {
-                if (me.attr('reset') === '1') {
-                    form[0].reset();
-                }
-
-                if (gee.isset(this.data.msg)) {
-                    gee.alert({
-                        title: 'Alert!',
-                        txt: this.data.msg
-                    });
-                }
-
-                if (gee.isset(this.data.uri)) {
-                    location.href = (this.data.uri === '') ? g.apiUri : this.data.uri;
-                }
-
-                if (gee.isset(this.data.goback)) {
-                    history.go(-1);
-                }
-
-                if (gee.isset(this.data.reset)) {
-                    form[0].reset();
-                }
-
-                if (gee.check(this.data.func)) {
-                    gee.clog(this.data.func);
-                    gee.exe(this.data.func, me);
-                }
+                gee.alert({
+                    title: 'Error!',
+                    txt: 'Server Error, Please Try Later(' + this.code + ')'
+                });
             }
-        };
+        } else {
+            if (me.getAttribute('reset') === '1') {
+                form.reset();
+            }
 
-    form.find('input').each(function () {
-        if ($(this).val() == $(this).attr('placeholder')) $(this).val('');
+            if (gee.isDefined(this.data.msg)) {
+                gee.alert({
+                    title: 'Alert!',
+                    txt: this.data.msg
+                });
+            }
+
+            if (gee.isDefined(this.data.uri)) {
+                location.href = (this.data.uri === '') ? gee.apiUri : this.data.uri;
+            }
+
+            if (gee.isDefined(this.data.goback)) {
+                history.go(-1);
+            }
+
+            if (gee.isDefined(this.data.reset)) {
+                form.reset();
+            }
+
+            if (gee.check(this.data.func)) {
+                gee.logDebug(this.data.func, gee.debug);
+                gee.exe(this.data.func, me);
+            }
+        }
+    };
+
+    // Clear placeholder values from inputs
+    form.querySelectorAll('input').forEach(input => {
+        if (input.value === input.placeholder) {
+            input.value = '';
+        }
     });
 
     if (!$.validatr.validateForm(form)) {
         return false;
     } else {
-        me.attr('disabled', 'disabled').append('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
+        me.setAttribute('disabled', 'disabled');
+        let spinner = document.createElement('i');
+        spinner.className = 'fa fa-spinner fa-pulse fa-fw';
+        me.appendChild(spinner);
 
-        g.yell(me.data('uri'), form.serialize(), dAction, dAction);
+        gee.yell(me.dataset.uri, new FormData(form), dAction, dAction);
     }
 });
 
 /**
- * 自動切換至指定欄位
+ * Automatically move to the next input field when the current field is filled
  */
 gee.hook('autoNext', function (me) {
-    let $ta = $(me.data('ta')) || me.next('input'),
-        v = me.val();
+    let target = document.getElementById(me.dataset.ta) || me.nextElementSibling;
+    let value = me.value;
 
-    if (v.length == me.attr('maxlength')) {
-        if ($ta.length) {
-            $ta.get(0).focus();
-            $ta.get(0).select();
+    if (value.length === me.getAttribute('maxlength')) {
+        if (target) {
+            target.focus();
+            target.select();
         }
     }
 }, 'keyup');
 
-
+/**
+ * Synchronize all input fields with a specific prefix
+ */
 gee.hook('syncAll', function (me) {
-    let form = me.data('ta') ? $('#' + me.data('ta')) : me.closest('form'),
-        source = me.data('source') ? $('#' + me.data('source')) : me.closest('form'),
-        prefix = me.data('prefix');
+    let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
+    let source = me.dataset.source ? document.getElementById(me.dataset.source) : me.closest('form');
+    let prefix = me.dataset.prefix;
 
-    form.find('input[name|=\'' + prefix + '\']').each(function () {
-        let n = $(this).attr('name').replace(prefix + '-', ''),
-            v = source.find('input[name=\'' + n + '\']').val()
-        $(this).val(v);
+    if (!form || !source || !prefix) return;
+
+    form.querySelectorAll(`input[name|='${prefix}']`).forEach(input => {
+        let name = input.getAttribute('name').replace(`${prefix}-`, '');
+        let value = source.querySelector(`input[name='${name}']`)?.value || '';
+        input.value = value;
     });
 });
