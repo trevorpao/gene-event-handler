@@ -62,13 +62,13 @@ let gene = {
         }
     },
 
-    hookTag: function(newTagName, func) {
-        if (!gene.check(newTagName)) {
-            gene.tags.push(newTagName);
-            gene.hook(newTagName, func);
-        } else {
-            gene.clog(newTagName + ' overwrite?');
-        }
+    hookTag: function(newTagName, func, opts = {}) {
+        // Register a custom element handler; opts.overwrite to replace existing
+        return customElem.register(newTagName, func, opts);
+    },
+
+    unhookTag: function(tagName) {
+        return customElem.unregister(tagName);
     },
 
     hook: function(functionName, fun, evt) {
@@ -110,9 +110,10 @@ let gene = {
     },
 
     init: function(element = 'body') {
-        gene.tags.forEach(tag => {
-            gene.exe(tag, document.querySelectorAll(tag));
-        });
+        const root = typeof element === 'string' ? document.querySelector(element) || document : (element || document);
+
+        // Apply registered custom element handlers once per element
+        customElem.apply(root, { logger: gene.clog, debug: gene.debug });
 
         document.querySelectorAll(`${element} .${gene.taClass}`).forEach(me => {
             let evt = me.dataset.event || gene.evts[me.dataset.behavior] || 'click';

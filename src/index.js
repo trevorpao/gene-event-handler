@@ -9,6 +9,11 @@ gee.debug = 1;
 // Set the subfolder for plugins
 gee.subFolder = '../../app/scripts/plugins';
 
+// Example: register a custom element via gee.customElem / hookTag
+// This will replace <gee-hello></gee-hello> with a span greeting.
+gee.customElem.register('gee-hello', () => '<span class="text-success">Hello from customElem!</span>');
+// Equivalent legacy API: gee.hookTag('gee-hello', fn);
+
 // Initialize the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', async function() {
     try {

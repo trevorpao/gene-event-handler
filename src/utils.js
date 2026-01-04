@@ -21,6 +21,20 @@ const utils = {
                 console.log(message);
             }
         }
+    },
+
+    // Extracts all attributes from a node into a plain object
+    extractAttr: function (nodes) {
+        const attr = {};
+        if (!nodes) return attr;
+        const list = nodes.length !== undefined ? nodes : [nodes];
+        list.forEach(node => {
+            if (!node || !node.attributes) return;
+            Array.from(node.attributes).forEach(a => {
+                attr[a.name] = a.value;
+            });
+        });
+        return attr;
     }
 };
 
