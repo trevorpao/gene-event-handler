@@ -8,6 +8,7 @@
   - [Legacy 版本用法](../README.md#basic-usage-legacy-build)
   - [安裝方式](../README.md#installation)
   - [Validatr 驗證](validatr.md)
+  - [yell 請求助手](yell.md)
 
 - 開發指南
   - [貢獻說明](../README.md#contribute)
