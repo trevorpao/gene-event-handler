@@ -1,6 +1,7 @@
 // Importing utility functions
 import utils from './utils.js';
-import validatr from './validatr.js';
+import customElem from './customElem.js';
+import { createYell } from './yell.js';
 
 'use strict';
 
@@ -13,89 +14,6 @@ let gene = {
     subFolder: 'scripts/plugins',
     taClass: 'gee',
     apiUri: '/',
-
-    yell: async function(uri, postData, successCB, errorCB, type = 'POST', hideLoadAnim = false, opts = {}) {
-        // Allow passing an options object as the 5th arg for flexibility
-        const options = (typeof type === 'object' && type !== null) ? type : opts;
-        const method = (typeof type === 'string') ? type : (options.method || 'POST');
-        const fullUri = uri.includes('://') ? uri : gene.apiUri + uri;
-
-        const mergedHeaders = { ...(options.headers || {}) };
-        let body = postData;
-
-        // Auto JSON-encode plain objects; leave FormData/Blob untouched
-        const isPlainObject = postData && typeof postData === 'object' && !(postData instanceof FormData) && !(postData instanceof Blob);
-        if (isPlainObject) {
-            body = JSON.stringify(postData);
-            if (!mergedHeaders['Content-Type']) mergedHeaders['Content-Type'] = 'application/json';
-        }
-
-        const showLoading = options.hideLoadAnim !== undefined ? !options.hideLoadAnim : !hideLoadAnim;
-        if (showLoading) {
-            gene.loadAnim('show');
-        }
-
-        const fetchOptions = {
-            method,
-            body,
-            headers: mergedHeaders,
-            credentials: options.credentials || 'same-origin',
-            mode: options.mode || 'cors'
-        };
-
-        if (options.signal) fetchOptions.signal = options.signal;
-
-        let normalized = { ok: false, code: 0, data: null, error: null, status: 0 };
-
-        try {
-            const res = await fetch(fullUri, fetchOptions);
-            let data = null;
-            try {
-                data = await res.json();
-            } catch (e) {
-                data = null;
-            }
-
-            const payload = data || {};
-            const code = utils.isDefined(payload.code) ? payload.code : (res.ok ? 1 : res.status);
-            const msg = payload.msg || payload.error || res.statusText || 'Server Error';
-            const isErrorPayload = utils.isDefined(payload.errorCode) || (!res.ok);
-
-            normalized = {
-                ok: res.ok && !isErrorPayload,
-                code,
-                data: payload.data !== undefined ? payload.data : payload,
-                error: isErrorPayload ? msg : null,
-                status: res.status
-            };
-
-            if (!normalized.ok) {
-                if (typeof errorCB === 'function') {
-                    errorCB.call(normalized);
-                } else {
-                    gene.alert({ title: 'Error!', txt: msg + '(' + code + ')' });
-                }
-                return normalized;
-            }
-
-            if (typeof successCB === 'function') {
-                successCB.call(normalized);
-            }
-            return normalized;
-        } catch (error) {
-            normalized = { ok: false, code: 0, data: null, error: error.message, status: 0 };
-            gene.err('ajax fail(' + error.message + ')!!');
-            if (typeof errorCB === 'function') {
-                errorCB.call(normalized);
-            }
-            return normalized;
-        } finally {
-            utils.logDebug('ajax complete', gene.debug);
-            if (showLoading) {
-                gene.loadAnim('hide');
-            }
-        }
-    },
 
     exe: function(func, args) {
         gene.clog('exe::' + func);
@@ -254,5 +172,9 @@ let gene = {
         document.querySelectorAll(`.${gene.taClass}`).forEach(el => el.classList.remove(gene.taClass));
     }
 };
+
+// Expose customElem via gene for external use when needed
+gene.customElem = customElem;
+gene.yell = createYell(gene);
 
 export default gene;
