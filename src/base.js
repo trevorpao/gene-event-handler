@@ -1,3 +1,5 @@
+import validatr from './validatr.js';
+
 "use strict";
 
 // Hook for handling 'react' events
@@ -99,7 +101,7 @@ gee.hook('stdSubmit', function (me) {
         }
     });
 
-    if (!$.validatr.validateForm(form)) {
+    if (!validatr.validateForm(form)) {
         return false;
     } else {
         me.setAttribute('disabled', 'disabled');

@@ -7,6 +7,7 @@
   - [快速開始（ESM 範例）](../README.md#basic-usage-es-modules)
   - [Legacy 版本用法](../README.md#basic-usage-legacy-build)
   - [安裝方式](../README.md#installation)
+  - [Validatr 驗證](validatr.md)
 
 - 開發指南
   - [貢獻說明](../README.md#contribute)

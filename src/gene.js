@@ -1,5 +1,6 @@
 // Importing utility functions
 import utils from './utils.js';
+import validatr from './validatr.js';
 
 'use strict';
 
@@ -68,7 +69,7 @@ let gene = {
             }
         });
 
-        if (!$.validatr.validateForm(form)) {
+        if (!validatr.validateForm(form)) {
             return false;
         } else {
             me.disabled = true;
