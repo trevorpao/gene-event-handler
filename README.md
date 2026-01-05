@@ -11,13 +11,27 @@ Behavior can be controlled by genes.
 * Home page - [https://github.com/trevorpao/geneEH](https://github.com/trevorpao/geneEH)
 * Demo page - [https://trevorpao.github.io/geneEH/](https://trevorpao.github.io/geneEH/)
 
+### View docs locally
+
+```bash
+npm install    # first time only
+npm run readme # serves ./document at http://localhost:3000
+```
+
 ### Dependencies
-- [cash-dom](https://github.com/fabiospampinato/cash) (lightweight jQuery-compatible API)
-- [validatr](https://github.com/macek/jquery-validate) or equivalent form validator used by the project
+- [validatr](https://github.com/macek/jquery-validate) or equivalent form validator used by the project (ES module port bundled here)
 
 ### Installation
 
-- Bower
+#### Via npm (recommended for development)
+
+```bash
+npm install       # install dependencies
+npm run watch     # start parcel dev server at http://localhost:1234
+npm run build     # build production assets into dist/
+```
+
+#### Via Bower (legacy)
 
 ```bash
 bower install gene-event-handler
@@ -38,9 +52,6 @@ In order to hide all elements when they are supposed to be hidden. (Anti Flicker
 - HTML + JavaScript (bundled/module workflow)
 
 ```html
-<!-- Load a jQuery-compatible helper -->
-<script src="https://unpkg.com/cash-dom/dist/cash.min.js"></script>
-
 <script type="module">
   import gee from './scripts/gene.js';
 
@@ -63,24 +74,14 @@ In order to hide all elements when they are supposed to be hidden. (Anti Flicker
 If you are using the prebuilt script output from this repository’s `app/scripts` bundle, include it directly:
 
 ```html
-<script src="https://unpkg.com/cash-dom/dist/cash.min.js"></script>
-<script src="scripts/jquery.gene.min.js"></script>
+<script src="scripts/gene.min.js"></script>
 
 <script>
   var gee = window.gee;
   gee.init();
+  // Note: legacy bundle no longer ships a jQuery/cash shim; if you relied on `$`, add your own.
 </script>
 ```
-
-## Contribute
-
-You're more than welcome to contribute to this project. 
-
-* Run `gulp serve` to preview and watch for changes
-* Run `bower install --save <package>` to install frontend dependencies
-* Run `gulp serve:test` to run the tests in the browser
-* Run `gulp` to build your webapp for production
-* Run `gulp serve:dist` to preview the production build
 
 Enjoy!
 

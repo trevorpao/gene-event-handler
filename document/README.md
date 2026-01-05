@@ -12,12 +12,19 @@ Behavior can be controlled by genes.
 * Demo page - [https://trevorpao.github.io/geneEH/](https://trevorpao.github.io/geneEH/)
 
 ### Dependencies
-- [cash-dom](https://github.com/fabiospampinato/cash) (lightweight jQuery-compatible API)
-- [validatr](https://github.com/macek/jquery-validate) or equivalent form validator used by the project
+- [validatr](https://github.com/macek/jquery-validate) or equivalent form validator used by the project (ES module port bundled here)
 
 ### Installation
 
-- Bower
+- npm（開發推薦）
+
+```bash
+npm install       # 安裝依賴
+npm run watch     # 啟動 parcel dev server（app/index.html），預設 http://localhost:1234
+npm run build     # 產出 dist/
+```
+
+- Bower（legacy）
 
 ```bash
 bower install gene-event-handler
@@ -38,9 +45,6 @@ In order to hide all elements when they are supposed to be hidden. (Anti Flicker
 - HTML + JavaScript (bundled/module workflow)
 
 ```html
-<!-- Load a jQuery-compatible helper -->
-<script src="https://unpkg.com/cash-dom/dist/cash.min.js"></script>
-
 <script type="module">
   import gee from './scripts/gene.js';
 
@@ -63,12 +67,12 @@ In order to hide all elements when they are supposed to be hidden. (Anti Flicker
 If you are using the prebuilt script output from this repository’s `app/scripts` bundle, include it directly:
 
 ```html
-<script src="https://unpkg.com/cash-dom/dist/cash.min.js"></script>
-<script src="scripts/jquery.gene.min.js"></script>
+<script src="scripts/gene.min.js"></script>
 
 <script>
   var gee = window.gee;
   gee.init();
+  // 若仍需 `$`，請自行引入（legacy bundle 不再附帶 jQuery/cash）。
 </script>
 ```
 

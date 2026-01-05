@@ -1,8 +1,4 @@
-// Load plugins
-import cash from 'cash-dom';
+// Expose gene on window for non-module consumers
 import gene from './gene';
 
-
-// Set plugins globally
-window.$ = cash;
 window.gee = gene;

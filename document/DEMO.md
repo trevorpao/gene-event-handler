@@ -14,10 +14,10 @@
 
 ## 範例區塊（app/index.html）
 - **Basic Alert**：`<a class="gee" data-gene="click:alert">` 使用內建 `alert` 行為。
-- **Auto Next**：輸入欄位加上 `data-gene="keyup:autoNext"` 與 `data-ta`，輸入到 maxlength 會跳到下一欄；實作在 `app/scripts/plugins/autoNext.js`，HTML 片段在 `app/scripts/tmpls/sample2.html`。
-- **Sync Form**：`data-gene="syncAll"` 會把來源表單的值複製到 `data-prefix` 指定前綴的欄位。
-- **Custom Element**：`<gee-hello>` 透過 `gee.customElem` 在啟動時被替換展示。
-- **Validation + Submit**：`data-gene="stdSubmit"` 透過 `gee.yell` 送出 `FormData`，並使用 `src/validatr.js` 做表單驗證；插件在 `app/scripts/plugins/stdSubmit.js`。
+- **Auto Next**：`data-gene="keyup:autoNext"`、`data-ta` 指定下一個輸入；達到 `maxlength` 自動跳轉。實作：`app/scripts/plugins/autoNext.js`；範例片段：`app/scripts/tmpls/sample2.html`。
+- **Sync Form**：`data-gene="syncAll"` 把來源表單值複製到 `data-prefix` 前綴的欄位。
+- **Custom Element**：`<gee-hello>` 透過 `gee.customElem` 啟動時替換展示。
+- **Validation + Submit**：`data-gene="stdSubmit"` 透過 `gee.yell` 送 `FormData`，並用 `src/validatr.js` 驗證；插件：`app/scripts/plugins/stdSubmit.js`。
 - **Code Previews**：Prism 透過 `data-src` 載入 `app/scripts/tmpls/*.html` 與 `app/scripts/plugins/*.js` 展示程式碼。
 
 ## 延伸技巧

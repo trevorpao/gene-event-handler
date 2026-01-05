@@ -69,6 +69,8 @@ const fieldResult = validatr.validateField(form.elements.email, {
 - `onFieldValidate(result)`: 單欄位驗證回呼，`result` 為 `{ valid, errors, field }`。
 - `onValidate(result)`: 表單驗證回呼，`result` 為 `{ valid, errors }`。
 - `preventInvalid`（預設 `true`）：在 `attach` 模式下，阻止無效輸入事件。
+- `showFieldErrors`（預設 `true`）：自動在欄位下方插入 `.validatr-err`，使用 `errorTemplate` 呈現。
+- `errorTemplate` / `errorClass`：自訂錯誤節點的 HTML 與 class，預設 `<div class="validatr-err">{{message}}</div>`。
 
 ## 回傳格式
 - `validateField`：`{ valid: boolean, errors: Array<{ field, rule, message }>, field }`
@@ -118,5 +120,6 @@ addRule('password', field => {
 - 若有 `$`（例如 cash-dom），會掛 `window.$.validatr = validatr`，但不再提供舊版 `$.fn.validatr` 插件介面。
 
 ## 注意
-- 已不含舊版自訂測試（如 `chinese`、`password` 等）與自動插入錯誤訊息的 UI。若需要，請在 `onFieldValidate` / `onValidate` 中自行處理。
+- 已不含舊版自訂測試（如 `chinese`、`password` 等）；可用 `addRule` 自行擴充。
+- 自動插入錯誤訊息採用 `.validatr-err` inline 節點，若要改樣式或位置可覆寫 `errorTemplate`/`errorClass` 或關閉 `showFieldErrors` 改用自訂 UI。
 - 若專案仍有舊程式碼呼叫 `$.validatr.validateForm(form)`，請改為 `validatr.validateForm(form)`（已在 `gene.js` / `base.js` 調整）。
