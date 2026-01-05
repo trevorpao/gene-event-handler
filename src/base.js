@@ -1,5 +1,12 @@
 "use strict";
 
+// Expose gene on window for non-module consumers
+import gene from './gene';
+import validatr from './validatr';
+
+window.gee = gene;
+window.validatr = validatr;
+
 // Hook for handling 'react' events
 gee.hook('react', function (me) {
     let target = me.event.target;

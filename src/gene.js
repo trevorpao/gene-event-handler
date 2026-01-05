@@ -31,8 +31,18 @@ let gene = {
 
     load: function(functionName) {
         if (!functionName) return null;
-        const uri = new URL(gene.subFolder + '/' + functionName + '.js', import.meta.url);
-        gene.clog(uri.pathname);
+        const base = (() => {
+            if (typeof document !== 'undefined' && document.currentScript && document.currentScript.src) {
+                return document.currentScript.src;
+            }
+            if (typeof window !== 'undefined' && window.location && window.location.href) {
+                return window.location.href;
+            }
+            return '';
+        })();
+
+        const uri = new URL(gene.subFolder + '/' + functionName + '.js', base);
+        gene.clog(uri.pathname || uri.href);
 
         return import(uri.pathname).catch(err => {
             gene.err('load fail::' + functionName + ' :: ' + (err && err.message ? err.message : err));

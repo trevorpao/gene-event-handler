@@ -1,5 +1,4 @@
-import './bootstrap';
-import './validatr';
+
 import './base';
 
 // Set API URI and enable debugging

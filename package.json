@@ -1,12 +1,12 @@
 {
   "name": "gene-event-handler",
-  "version": "0.2",
+  "version": "2.1",
   "description": "a event handler",
   "author": "Trevor Pao",
   "scripts": {
     "watch": "parcel serve app/index.html --open",
     "readme": "http-server document -p 3000 -c-1 -o index.html",
-    "build": "parcel build",
+    "build": "esbuild src/base.js --bundle --minify --format=iife --global-name=gee --outfile=dist/gene.min.js",
     "lint": "npx eslint ./src/*.js",
     "fix": "npx eslint ./src/*.js --fix"
   },
@@ -21,6 +21,7 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "esbuild": "^0.21.5",
     "http-server": "^14.1.1",
     "parcel": "^2.16.3"
   },
@@ -37,5 +38,8 @@
       ]
     }
   },
+  "files": [
+    "dist/gene.min.js"
+  ],
   "dependencies": {}
 }
