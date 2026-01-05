@@ -19,6 +19,12 @@ const defaultMessages = {
 // where fn(field, options) => { valid: boolean, message: string }
 const customRules = new Map();
 
+const defaultOptions = {
+  showFieldErrors: true,
+  errorTemplate: '<div class="validatr-err">{{message}}</div>',
+  errorClass: 'validatr-err'
+};
+
 export function addRule(name, fn) {
   if (!name || typeof name !== 'string') throw new Error('Rule name must be a non-empty string');
   if (typeof fn !== 'function') throw new Error('Rule callback must be a function');
@@ -46,6 +52,36 @@ function runRule(field, name, test, message) {
   if (ok) return null;
   const msg = typeof message === 'function' ? message() : message;
   return { field, rule: name, message: msg };
+}
+
+function clearError(field, options = {}) {
+  const cls = options.errorClass || defaultOptions.errorClass;
+  if (!field) return;
+  let next = field.nextElementSibling;
+  while (next && next.classList && next.classList.contains(cls)) {
+    const toRemove = next;
+    next = next.nextElementSibling;
+    toRemove.remove();
+  }
+}
+
+function renderError(field, message, options = {}) {
+  if (!field || !field.parentNode) return;
+  clearError(field, options);
+  const tmpl = options.errorTemplate || defaultOptions.errorTemplate;
+  const cls = options.errorClass || defaultOptions.errorClass;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = tmpl.replace(/{{\s*message\s*}}/g, message);
+  let errEl = wrapper.firstElementChild;
+  if (!errEl) {
+    errEl = document.createElement('div');
+    errEl.className = cls;
+    errEl.textContent = message;
+  } else if (!errEl.classList.contains(cls)) {
+    errEl.classList.add(cls);
+  }
+
+  field.insertAdjacentElement('afterend', errEl);
 }
 
 function validateField(field, options = {}) {
@@ -135,6 +171,13 @@ function validateField(field, options = {}) {
   });
 
   const result = { valid: errs.length === 0, errors: errs, field };
+  if (options.showFieldErrors !== false) {
+    if (result.valid) {
+      clearError(field, options);
+    } else if (errs.length) {
+      renderError(field, errs[0].message, options);
+    }
+  }
   if (typeof onFieldValidate === 'function') onFieldValidate(result);
   return result;
 }
@@ -149,6 +192,12 @@ function validateForm(form, options = {}) {
   });
 
   const result = { valid: errors.length === 0, errors };
+
+  if (!result.valid && options.showAlert !== false) {
+    const first = errors[0];
+    const msg = first && first.message ? first.message : '請填寫必填欄位';
+  }
+
   if (typeof options.onValidate === 'function') options.onValidate(result);
   return result.valid;
 }

@@ -1,18 +1,21 @@
-/**
- * 同步多欄位內容
- */
-'use strict';
 
-;(function(gee, $) {
-    gee.hook('syncAll', function (me){
-        var f = me.data('ta') ? $('#'+ me.data('ta')) : me.closest('form'),
-            s = me.data('source') ? $('#'+ me.data('source')) : me.closest('form'),
-            prefix = me.data('prefix');
+    gee.hook('syncAll', function(me) {
+        const form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
+        const source = me.dataset.source ? document.getElementById(me.dataset.source) : me.closest('form');
+        const prefix = me.dataset.prefix;
 
-        f.find('input[name|=\''+ prefix +'\']').each(function(){
-            var n = $(this).attr('name').replace(prefix+'-', ''),
-                v = s.find('input[name=\''+ n +'\']').val()
-            $(this).val(v);
+        gee.clog('syncAll invoked');
+
+        if (!form || !source || !prefix) return;
+
+        gee.clog('syncAll from ' + source.id + ' to inputs with prefix ' + prefix);
+
+        form.querySelectorAll(`input[name|='${prefix}']`).forEach(input => {
+            const name = input.getAttribute('name').replace(`${prefix}-`, '');
+            const value = source.querySelector(`input[name='${name}']`)?.value || '';
+            input.value = value;
         });
     });
-}(gee, jQuery));
+
+
+export default null;

@@ -1,10 +1,10 @@
 - 入門指南
   - [專案介紹](intro.md)
   - [README（GitHub）](https://github.com/trevorpao/geneEH)
-  - [Demo 頁面](https://trevorpao.github.io/geneEH/)
+  - [快速開始（ESM 範例）](../README.md#basic-usage-es-modules)
+  - [Demo 頁面](DEMO.md)
 
 - 使用手冊
-  - [快速開始（ESM 範例）](../README.md#basic-usage-es-modules)
   - [Legacy 版本用法](../README.md#basic-usage-legacy-build)
   - [安裝方式](../README.md#installation)
   - [Validatr 驗證](validatr.md)

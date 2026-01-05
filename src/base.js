@@ -23,6 +23,10 @@ gee.hook('react', function (me) {
     }
 });
 
+gee.hook('notfound', function (me) {
+    gee.err('command not found!!');
+});
+
 // Hook for displaying alerts
 gee.hook('alert', function (me) {
     let title = me.title || me.dataset.title;
@@ -38,34 +42,68 @@ gee.hook('resetForm', function (me) {
     if (form) form.reset();
 });
 
-/**
- * Automatically move to the next input field when the current field is filled
- */
-gee.hook('autoNext', function (me) {
-    let target = document.getElementById(me.dataset.ta) || me.nextElementSibling;
-    let value = me.value;
 
-    if (value.length === me.getAttribute('maxlength')) {
-        if (target) {
-            target.focus();
-            target.select();
+gee.hook('stdSubmit', async function(me) {
+    const form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
+    if (!form) return;
+
+    const finish = () => {
+      me.removeAttribute('disabled');
+      const icon = me.querySelector('i');
+      if (icon) icon.remove();
+    };
+
+    const handleResult = res => {
+      finish();
+      const result = res || {};
+
+      if (result.code !== 1 || result.ok === false) {
+        if (isDefined(result.data) && isDefined(result.data.msg)) {
+          gee.alert && gee.alert({ title: 'Alert!', txt: result.data.msg });
+        } else {
+          gee.alert && gee.alert({ title: 'Error!', txt: 'Server Error, Please Try Later(' + (result.code || 0) + ')' });
         }
-    }
-}, 'keyup');
+        return;
+      }
 
-/**
- * Synchronize all input fields with a specific prefix
- */
-gee.hook('syncAll', function (me) {
-    let form = me.dataset.ta ? document.getElementById(me.dataset.ta) : me.closest('form');
-    let source = me.dataset.source ? document.getElementById(me.dataset.source) : me.closest('form');
-    let prefix = me.dataset.prefix;
+      if (me.getAttribute('reset') === '1' || isDefined(result.data?.reset)) {
+        form.reset();
+      }
 
-    if (!form || !source || !prefix) return;
+      if (isDefined(result.data?.msg)) {
+        gee.alert && gee.alert({ title: 'Alert!', txt: result.data.msg });
+      }
 
-    form.querySelectorAll(`input[name|='${prefix}']`).forEach(input => {
-        let name = input.getAttribute('name').replace(`${prefix}-`, '');
-        let value = source.querySelector(`input[name='${name}']`)?.value || '';
-        input.value = value;
+      if (isDefined(result.data?.uri)) {
+        location.href = result.data.uri === '' ? gee.apiUri : result.data.uri;
+      }
+
+      if (isDefined(result.data?.goback)) {
+        history.go(-1);
+      }
+
+      if (gee.check(result.data?.func)) {
+        gee.logDebug(result.data.func, gee.debug);
+        gee.exe(result.data.func, me);
+      }
+    };
+
+    // Clear placeholder values from inputs
+    form.querySelectorAll('input').forEach(input => {
+      if (input.value === input.placeholder) {
+        input.value = '';
+      }
     });
+
+    if (validatr && !validatr.validateForm(form)) {
+        return false;
+    }
+
+    me.setAttribute('disabled', 'disabled');
+    const spinner = document.createElement('i');
+    spinner.className = 'fa fa-spinner fa-pulse fa-fw';
+    me.appendChild(spinner);
+
+    const result = await gee.yell(me.dataset.uri, new FormData(form));
+    handleResult(result);
 });

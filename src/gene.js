@@ -40,10 +40,6 @@ let gene = {
         });
     },
 
-    notfound: function(me) {
-        gene.err('command not found!!');
-    },
-
     err: function(txt) {
         if (txt !== '')
             this.clog('Error::' + txt);
@@ -56,14 +52,7 @@ let gene = {
     },
 
     clog: function(txt) {
-        if (typeof console != 'undefined' && gene.debug == 1) {
-            if (typeof txt == 'string' || typeof txt == 'number') {
-                console.log('gene::' + txt);
-            } else {
-                console.log('gene::' + typeof(txt));
-                console.log(txt);
-            }
-        }
+        utils.logDebug(txt, gene.debug);
     },
 
     hookTag: function(newTagName, func, opts = {}) {
@@ -110,7 +99,7 @@ let gene = {
 
         me.event = evt;
         gene.clog('start::' + evt.type);
-        gene.exe(me.dna[evt.type], $(me));
+        gene.exe(me.dna[evt.type], me);
     },
 
     init: function(element = 'body') {
@@ -125,8 +114,15 @@ let gene = {
 
             if (me.dataset.gene) {
                 me.dataset.gene.split(',').forEach(pair => {
-                    let [event, behavior] = pair.split(':');
-                    promoterMapping[event || 'click'] = behavior || event;
+                    const trimmed = pair.trim();
+                    const hasColon = trimmed.includes(':');
+                    if (hasColon) {
+                        let [event, behavior] = trimmed.split(':');
+                        promoterMapping[event || 'click'] = behavior || event || 'notfound';
+                    } else {
+                        // No explicit event specified; fall back to detected/default evt (usually click)
+                        promoterMapping[evt] = trimmed || 'notfound';
+                    }
                 });
             } else {
                 promoterMapping[evt] = me.dataset.behavior || 'notfound';
@@ -141,8 +137,10 @@ let gene = {
             }
 
             utils.logDebug(promoterMapping, gene.debug);
-            me.dna = promoterMapping;
-            me.replaceWith(me.cloneNode(true));
+            const clone = me.cloneNode(true);
+            clone.dna = promoterMapping;
+            me.replaceWith(clone);
+            me = clone;
 
             Object.entries(promoterMapping).forEach(([event, behavior]) => {
                 if (!gene.check(behavior)) {
