@@ -3,6 +3,7 @@
   - [README（GitHub）](https://github.com/trevorpao/geneEH)
   - [快速開始（ESM 範例）](../README.md#basic-usage-es-modules)
   - [Demo 頁面](DEMO.md)
+  - [開發守則](rule.md)
 
 - 使用手冊
   - [Legacy 版本用法](../README.md#basic-usage-legacy-build)

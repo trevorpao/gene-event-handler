@@ -12,6 +12,58 @@
 * 支援 `hover` 語義（展開為 `mouseenter` + `mouseleave`）。
 * 可搭配 `data-event` / `data-behavior` 舊寫法；初始化時 `.gee` 會被掃描並移除。
 
+#### 範例：以 submit 綁定 sendAction
+
+JavaScript（原生 ESM 入口）：
+```javascript
+// 若使用打包後的 iife，改成：import './dist/gene.min.js'; const gee = window.gee;
+import gee from './src/gene.js';
+import './src/base.js';           // 內建 hooks / validatr
+
+// 註冊行為基因
+gee.hook('sendAction', function (me) {
+  const form = me; // me 是 form
+  const msgInput = form.querySelector('#sms-msg');
+  const msg = (msgInput?.value || '').trim();
+  if (!msg) {
+    alert('內容不可為空！');
+    return false;
+  }
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn?.classList.add('is-loading');
+
+  setTimeout(() => {
+    submitBtn?.classList.remove('is-loading');
+    alert('簡訊發送成功！內容：' + msg);
+  }, 1000);
+
+  return false; // 若不想讓瀏覽器實際提交
+});
+
+gee.hook('initForm', function () {
+  console.log('簡訊發送元件初始化完畢');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  gee.init(); // 掃描 .gee 並綁定對應行為
+});
+```
+
+HTML（表單 submit 綁定）：
+```html
+<form class="gee" data-gene="init:initForm,submit:sendAction" novalidate>
+  <div class="field is-grouped">
+    <p class="control is-expanded">
+      <input id="sms-msg" class="input" type="text" placeholder="輸入簡訊內容" required>
+    </p>
+    <p class="control">
+      <button type="submit" class="button is-primary">送簡訊</button>
+    </p>
+  </div>
+</form>
+```
+
 ### 2. 基本使用流程
 根據來源文件，其實作分為三個部分：
 

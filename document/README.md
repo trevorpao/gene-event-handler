@@ -24,7 +24,7 @@ npm run watch     # 啟動 parcel dev server（app/index.html），預設 http:/
 npm run build     # 產出 dist/
 ```
 
-- Bower（legacy）
+- Bower（v1）
 
 ```bash
 bower install gene-event-handler
@@ -62,7 +62,7 @@ In order to hide all elements when they are supposed to be hidden. (Anti Flicker
 </script>
 ```
 
-### Basic usage (legacy build)
+### Basic usage (v1 build)
 
 If you are using the prebuilt script output from this repository’s `app/scripts` bundle, include it directly:
 
@@ -72,7 +72,7 @@ If you are using the prebuilt script output from this repository’s `app/script
 <script>
   var gee = window.gee;
   gee.init();
-  // 若仍需 `$`，請自行引入（legacy bundle 不再附帶 jQuery/cash）。
+  // 若仍需 `$`，請自行引入（v1 bundle 不再附帶 jQuery/cash）。
 </script>
 ```
 
