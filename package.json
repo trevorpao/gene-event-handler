@@ -1,6 +1,6 @@
 {
   "name": "gene-event-handler",
-  "version": "2.1",
+  "version": "2.1.0",
   "description": "a event handler",
   "author": "Trevor Pao",
   "scripts": {
@@ -11,6 +11,15 @@
     "fix": "npx eslint ./src/*.js --fix"
   },
   "source": "src/index.js",
+  "main": "dist/gene.min.js",
+  "module": "src/base.js",
+  "exports": {
+    ".": {
+      "import": "./src/base.js",
+      "require": "./dist/gene.min.js",
+      "default": "./src/base.js"
+    }
+  },
   "license": "MIT",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "repository": {
@@ -39,6 +48,7 @@
     }
   },
   "files": [
+    "src",
     "dist/gene.min.js"
   ],
   "dependencies": {}
