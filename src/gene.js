@@ -44,7 +44,7 @@ let gene = {
         const uri = new URL(gene.subFolder + '/' + functionName + '.js', base);
         gene.clog(uri.pathname || uri.href);
 
-        return import(uri.pathname).catch(err => {
+        return import(/* @vite-ignore */ uri.pathname).catch(err => {
             gene.err('load fail::' + functionName + ' :: ' + (err && err.message ? err.message : err));
             return null;
         });
